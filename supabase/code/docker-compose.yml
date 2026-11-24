@@ -1,3 +1,7 @@
+# Plantilla de EasyPanel (easypanel-io/compose, etiqueta 18-05-2026, supabase/code/docker-compose.yml)
+# con UN solo cambio de YesAI (2026-11-24): el servicio `db` se une a la red
+# externa `easypanel-yesai` con el alias `yesai-db` (marcado "YesAI:" abajo).
+
 # Usage
 #   Start:              docker compose up -d
 #   Stop:               docker compose down
@@ -528,6 +532,14 @@ services:
         "-c",
         "log_min_messages=fatal" # prevents Realtime polling queries from appearing in logs
       ]
+    # YesAI: la base también en la red del proyecto yesai de EasyPanel, para que
+    # las Apps del proyecto (porterías y apps) la alcancen como `yesai-db`.
+    # Sin publicar 5432. Lo demás de Supabase sigue solo en su red.
+    networks:
+      default:
+      easypanel-yesai:
+        aliases:
+          - yesai-db
 
   vector:
     image: timberio/vector:0.53.0-alpine
@@ -608,3 +620,8 @@ services:
 volumes:
   db-config:
   deno-cache:
+
+# YesAI: la red del proyecto yesai de EasyPanel ya existe; aquí solo se usa.
+networks:
+  easypanel-yesai:
+    external: true
